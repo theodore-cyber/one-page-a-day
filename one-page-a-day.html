@@ -804,14 +804,6 @@
     }
   }
 
-  function nextOnboarding() {
-    if (currentOnboardingStep < 5) {
-      goToOnboarding(currentOnboardingStep + 1);
-    } else {
-      completeOnboarding();
-    }
-  }
-
   function resetOnboarding() {
     data.onboardingComplete = false;
     saveData(data);
