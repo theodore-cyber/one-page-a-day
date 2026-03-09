@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="One Page a Day" />
+  <title>One Page a Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', 'Garamond', 'Times New Roman', serif;
+      background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #3d2415 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #2d1b0e;
+      position: relative;
+    }
+    
+    /* Subtle paper texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 92, 46, 0.03) 2px, rgba(139, 92, 46, 0.03) 4px);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.5;
+    }
+    
+    /* Smooth transitions for all interactive elements */
+    button, .btn, .cal-day, .book-card, .stat-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    button:hover:not(:disabled), .btn:hover, .cal-day:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+    
+    button:active, .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Onboarding */
+    #onboarding {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+
+    .onboarding-screen {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      text-align: center;
+      color: white;
+    }
+
+    .onboarding-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+
+    .onboarding-icon {
+      font-size: 5rem;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .onboarding-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.6s ease-out 0.1s backwards;
+    }
+
+    .onboarding-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      opacity: 0.95;
+      font-weight: 500;
+      max-width: 400px;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    }
+
+    .onboarding-btn {
+      font-size: 1.1rem;
+      padding: 14px 32px;
+      animation: fadeInUp 0.6s ease-out 0.3s backwards;
+    }
+
+    .onboarding-dots {
+      display: flex;
+      gap: 10px;
+      padding: 20px 0;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dot.active {
+      background: white;
+      width: 28px;
+      border-radius: 5px;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 24px 16px 60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header */
+    .header { 
+      text-align: center; 
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, #f5e6d3, #e8d4b8);
+      padding: 32px 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
+      border: 2px solid #8b5a2b;
+      position: relative;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(139, 90, 43, 0.02) 2px,
+        rgba(139, 90, 43, 0.02) 4px
+      );
+      border-radius: 14px;
+      pointer-events: none;
+    }
+    
+    .header-icon { font-size: 2.5rem; margin-bottom: 6px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2)); }
+    .header h1 { 
+      font-size: 2.2rem; 
+      font-weight: 700; 
+      color: #4a2c1a; 
+      letter-spacing: 1px; 
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+      font-family: 'Georgia', serif;
+    }
+    .header p { color: #6b4423; font-size: 0.95rem; margin-top: 4px; font-style: italic; }
+
+    /* Notification button */
+    .notif-row { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    .notif-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 999px; border: none; cursor: pointer;
+      font-size: 0.85rem; font-weight: 500; transition: background 0.2s;
+    }
+    .notif-btn.on  { background: #d1fae5; color: #065f46; }
+    .notif-btn.off { background: #f3f4f6; color: #6b7280; }
+
+    /* Did you read today banner */
+    .read-today-banner {
+      background: linear-gradient(135deg, #10b981, #0d9488);
+      border-radius: 16px; padding: 28px 24px; margin-bottom: 24px;
+      color: white; box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+    }
+    .read-today-banner h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+    .read-today-banner p  { opacity: 0.9; margin-bottom: 18px; font-size: 0.95rem; }
+
+    /* Add more reading */
+    .add-more-row { margin-bottom: 20px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 10px; border: none;
+      cursor: pointer; font-size: 0.95rem; font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-white  { 
+      background: linear-gradient(135deg, #f5e6d3, #ecdcc5); 
+      color: #4a2c1a;
+      border: 1px solid #b8956a;
+    }
+    .btn-white:hover { 
+      background: linear-gradient(135deg, #fff, #f5e6d3);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+    .btn-green  { 
+      background: linear-gradient(135deg, #8b5a2b, #6b4423); 
+      color: #f5e6d3;
+      border: 1px solid #5a3a1a;
+    }
+    .btn-green:hover { 
+      background: linear-gradient(135deg, #a0764f, #7d5430);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    }
+    .btn-gray   { 
+      background: linear-gradient(135deg, #d4c4b0, #c4b49f); 
+      color: #2d1b0e;
+      border: 1px solid #9a8066;
+    }
+    .btn-gray:hover { 
+      background: linear-gradient(135deg, #e0d4c4, #d4c4b0);
+    }
+    .btn-red    { background: none; border: none; color: #8b4513; cursor: pointer; font-size: 0.85rem; padding: 4px 8px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Log form */
+    .log-form {
+      background: white; border-radius: 16px; padding: 24px;
+      margin-bottom: 24px; border: 2px solid #a7f3d0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .log-form h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 18px; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: #374151; margin-bottom: 6px; }
+    .form-group select,
+    .form-group input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #d1d5db;
+      border-radius: 10px; font-size: 1rem; outline: none;
+      transition: border-color 0.2s;
+      background: white;
+    }
+    .form-group select:focus,
+    .form-group input:focus { border-color: #10b981; }
+
+    .new-book-fields {
+      background: #f0fdf4; border-radius: 10px; padding: 14px;
+      margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* Readings to log list */
+    .readings-preview { border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 16px; }
+    .readings-preview h4 { font-size: 0.9rem; font-weight: 600; color: #374151; margin-bottom: 10px; }
+    .reading-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;
+    }
+    .reading-item-title { font-weight: 600; font-size: 0.9rem; }
+    .reading-item-sub   { font-size: 0.8rem; color: #6b7280; margin-top: 2px; }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+    @media (min-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #f5e6d3, #ecdcc5);
+      border-radius: 14px; 
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.3);
+      border: 1px solid #b8956a;
+    }
+    .stat-card.green  { border-left: 4px solid #6b4423; }
+    .stat-card.teal   { border-left: 4px solid #8b5a2b; }
+    .stat-card.cyan   { border-left: 4px solid #a0764f; }
+    .stat-label { font-size: 0.75rem; color: #6b4423; margin-bottom: 4px; font-weight: 600; letter-spacing: 0.5px; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #2d1b0e; line-height: 1; }
+
+    /* Calendar */
+    .calendar-card {
+      background: linear-gradient(135deg, #f5e6d3, #ecdcc5);
+      border-radius: 16px; 
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
+      margin-bottom: 24px;
+      border: 2px solid #8b5a2b;
+    }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .cal-header h3 { font-size: 1.1rem; font-weight: 700; color: #2d1b0e; }
+    .cal-nav { 
+      background: linear-gradient(135deg, #c19a6b, #b8956a); 
+      border: 1px solid #8b5a2b; 
+      cursor: pointer; 
+      padding: 6px 10px; 
+      border-radius: 8px; 
+      font-size: 1.1rem; 
+      color: #2d1b0e;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .cal-nav:hover { background: linear-gradient(135deg, #d4af7a, #c19a6b); }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-day-label { text-align: center; font-size: 0.7rem; font-weight: 600; color: #6b4423; padding-bottom: 6px; }
+    .cal-day {
+      aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+    }
+    .cal-day.empty   { background: none; }
+    .cal-day.no-read { 
+      background: linear-gradient(135deg, #faf6f0, #f0e9dd); 
+      color: #9a8066; 
+      cursor: pointer; 
+      border: 1px solid #d4c4b0;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .cal-day.no-read:hover { 
+      background: linear-gradient(135deg, #fff, #f5f0ea);
+      transform: scale(1.05);
+    }
+    .cal-day.did-read { 
+      background: linear-gradient(135deg, #8b5a2b, #6b4423); 
+      color: #f5e6d3; 
+      font-weight: 700; 
+      cursor: pointer;
+      border: 1px solid #5a3a1a;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .cal-day.did-read:hover { 
+      background: linear-gradient(135deg, #a0764f, #7d5430);
+      transform: scale(1.05);
+    }
+    .cal-day.today   { outline: 3px solid #c19a6b; outline-offset: 2px; }
+    .cal-legend { display: flex; gap: 16px; margin-top: 12px; }
+    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #6b4423; }
+    .cal-legend-dot { width: 14px; height: 14px; border-radius: 4px; }
+
+    /* Books list */
+    .books-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .books-card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 14px; }
+    .book-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; background: #f9fafb; border-radius: 10px; margin-bottom: 8px;
+      transition: background 0.15s;
+    }
+    .book-row:hover { background: #f0fdf4; }
+    .book-title  { font-weight: 600; font-size: 0.95rem; }
+    .book-author { font-size: 0.82rem; color: #6b7280; margin-top: 2px; }
+    .book-pages  { font-size: 0.8rem; color: #9ca3af; margin-top: 2px; }
+    .book-days   { text-align: right; }
+    .book-days-num  { font-size: 1.6rem; font-weight: 800; color: #10b981; line-height: 1; }
+    .book-days-label { font-size: 0.72rem; color: #9ca3af; }
+
+    /* Empty state */
+    .empty-state { background: white; border-radius: 16px; padding: 48px 24px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
+    .empty-state p { color: #9ca3af; font-size: 1rem; margin-bottom: 20px; }
+
+    /* Already read today check */
+    .already-read {
+      background: #f0fdf4; border: 1.5px solid #a7f3d0;
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px; color: #065f46; font-weight: 500;
+    }
+
+    /* Canon grid responsive */
+    @media (max-width: 768px) {
+      .canon-grid { grid-template-columns: 1fr !important; }
+    }
+
+    /* Checkbox styles */
+    .canon-checkbox {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      border-radius: 8px; cursor: pointer; transition: background 0.2s;
+    }
+    .canon-checkbox:hover { background: #f9fafb; }
+    .canon-checkbox input[type="checkbox"] {
+      width: 18px; height: 18px; cursor: pointer;
+    }
+    .canon-checkbox-label { flex: 1; font-size: 0.9rem; color: #374151; }
+  </style>
+</head>
+<body>
+<!-- Onboarding Screens -->
+<div id="onboarding" style="display:none;">
+  <div class="onboarding-screen" id="onboarding-0">
+    <div class="onboarding-content">
+      <div class="onboarding-icon">📚</div>
+      <h1 class="onboarding-title">Welcome to<br>One Page a Day</h1>
+      <p class="onboarding-text">The app for conquering the canon</p>
+      <button class="btn btn-green onboarding-btn" onclick="nextOnboarding()">Get Started →</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="onboarding-screen" id="onboarding-1" style="display:none;">
+    <div class="onboarding-content">
+      <div class="onboarding-icon">📖</div>
+      <h2 class="onboarding-title">Step 1:<br>Pick a Book</h2>
+      <p class="onboarding-text">Choose any book you've been meaning to read. Classic literature, modern fiction, non-fiction—anything that inspires you.</p>
+      <button class="btn btn-green onboarding-btn" onclick="nextOnboarding()">Next →</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot" onclick="goToOnboarding(0)"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="onboarding-screen" id="onboarding-2" style="display:none;">
+    <div class="onboarding-content">
+      <div class="onboarding-icon">✨</div>
+      <h2 class="onboarding-title">Step 2:<br>Commit to One Page</h2>
+      <p class="onboarding-text">Read at least one page every day. Just one page. It's so easy, you can't say no. Before you know it, you'll have read much more.</p>
+      <button class="btn btn-green onboarding-btn" onclick="nextOnboarding()">Next →</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot" onclick="goToOnboarding(0)"></span>
+      <span class="dot" onclick="goToOnboarding(1)"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="onboarding-screen" id="onboarding-3" style="display:none;">
+    <div class="onboarding-content">
+      <div class="onboarding-icon">📊</div>
+      <h2 class="onboarding-title">Step 3:<br>Log Your Progress</h2>
+      <p class="onboarding-text">Track your reading each day. Watch your streak grow, see your progress bars fill, and celebrate every book you finish.</p>
+      <button class="btn btn-green onboarding-btn" onclick="nextOnboarding()">Next →</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot" onclick="goToOnboarding(0)"></span>
+      <span class="dot" onclick="goToOnboarding(1)"></span>
+      <span class="dot" onclick="goToOnboarding(2)"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="onboarding-screen" id="onboarding-4" style="display:none;">
+    <div class="onboarding-content">
+      <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px; text-align: center;">
+        Book <span id="canonBookNumber">1</span> of 25
+      </div>
+      <div class="onboarding-icon">📚</div>
+      <h2 class="onboarding-title" id="canonBookTitle" style="margin-bottom: 8px;">The Iliad</h2>
+      <p class="onboarding-text" id="canonBookAuthor" style="font-size: 1rem; color: #6b7280; margin-bottom: 24px;">Homer</p>
+      <p class="onboarding-text" style="margin-bottom: 32px;">Have you read this book?</p>
+      
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="btn btn-green onboarding-btn" onclick="answerCanonBook(true)" style="flex: 1; max-width: 150px;">Yes ✓</button>
+        <button class="btn btn-gray onboarding-btn" onclick="answerCanonBook(false)" style="flex: 1; max-width: 150px;">No</button>
+      </div>
+      
+      <button onclick="skipCanonQuestions()" style="background:none; border:none; color:#6b7280; font-size:0.85rem; margin-top:20px; cursor:pointer;">Skip remaining</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot" onclick="goToOnboarding(0)"></span>
+      <span class="dot" onclick="goToOnboarding(1)"></span>
+      <span class="dot" onclick="goToOnboarding(2)"></span>
+      <span class="dot" onclick="goToOnboarding(3)"></span>
+      <span class="dot active"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="onboarding-screen" id="onboarding-5" style="display:none;">
+    <div class="onboarding-content">
+      <div class="onboarding-icon">🏆</div>
+      <h2 class="onboarding-title">Ready to Build<br>Your Reading Habit?</h2>
+      <p class="onboarding-text">One page at a time, one day at a time. Let's conquer the canon together!</p>
+      <button class="btn btn-green onboarding-btn" onclick="completeOnboarding()">Start Reading →</button>
+    </div>
+    <div class="onboarding-dots">
+      <span class="dot" onclick="goToOnboarding(0)"></span>
+      <span class="dot" onclick="goToOnboarding(1)"></span>
+      <span class="dot" onclick="goToOnboarding(2)"></span>
+      <span class="dot" onclick="goToOnboarding(3)"></span>
+      <span class="dot" onclick="goToOnboarding(4)"></span>
+      <span class="dot active"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="mainApp" style="display:none;">
+
+  <!-- Install Prompt Banner (iOS/Android) -->
+  <div id="installPrompt" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); max-width:90%; width:400px; background:linear-gradient(135deg, #8b5a2b, #6b4423); color:#f5e6d3; padding:16px 20px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.4); z-index:9999; border:2px solid #5a3a1a;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div style="flex:1;">
+        <div style="font-weight:700; margin-bottom:4px;">📚 Install One Page a Day</div>
+        <div style="font-size:0.85rem; opacity:0.9;">Add to home screen for easy access</div>
+      </div>
+      <button onclick="dismissInstallPrompt()" style="background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:#f5e6d3; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem;">Install</button>
+      <button onclick="dismissInstallPrompt()" style="background:none; border:none; color:#f5e6d3; font-size:1.5rem; cursor:pointer; padding:4px;">×</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">📖</div>
+    <h1>One Page a Day</h1>
+    <p>Build a daily reading habit, one page at a time</p>
+  </div>
+
+  <!-- Daily Quote -->
+  <div id="dailyQuote" style="background: linear-gradient(135deg, #ecdcc5, #e0d4c4); border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; border-left: 4px solid #8b5a2b; box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.3); border: 1px solid #b8956a;">
+    <div style="font-style: italic; color: #2d1b0e; font-size: 1rem; line-height: 1.6; margin-bottom: 8px;" id="quoteText"></div>
+    <div style="font-size: 0.85rem; color: #6b4423; font-weight: 600;" id="quoteAuthor"></div>
+  </div>
+
+  <!-- Notification toggle -->
+  <div class="notif-row">
+    <button class="notif-btn off" id="notifBtn" onclick="toggleNotifications()">
+      🔔 Enable Notifications
+    </button>
+    <button class="notif-btn off" onclick="showRecapMenu()" style="margin-left:8px; background:#f0fdf4; color:#059669;">
+      📅 Recaps
+    </button>
+    <button class="notif-btn off" onclick="showAnalytics()" style="margin-left:8px; background:#f0fdf4; color:#059669;">
+      📊 Analytics
+    </button>
+    <button class="notif-btn off" onclick="exportData()" style="margin-left:8px; background:#fef3c7; color:#92400e;">
+      💾 Export Data
+    </button>
+    <button class="notif-btn off" onclick="resetOnboarding()" style="margin-left:8px;">
+      🔄 Reset Intro
+    </button>
+  </div>
+
+  <!-- Daily prompt / already read -->
+  <div id="dailyPrompt"></div>
+
+  <!-- Log form -->
+  <div id="logForm" style="display:none;" class="log-form">
+    <h3>Log Your Reading</h3>
+
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="dateInput" max="" />
+    </div>
+
+    <div class="form-group">
+      <label>Select a book or add new</label>
+      <select id="bookSelect" onchange="onBookSelectChange()">
+        <option value="">Choose a book...</option>
+        <option value="new">+ Add New Book</option>
+      </select>
+    </div>
+
+    <div id="newBookFields" class="new-book-fields" style="display:none;">
+      <input type="text" id="newBookTitle" placeholder="Book Title *" />
+      <input type="text" id="newBookAuthor" placeholder="Author (optional)" />
+      <input type="number" id="newBookLength" placeholder="Total pages in book (optional)" min="1" />
+    </div>
+
+    <div id="articleFields" class="new-book-fields" style="display:none;">
+      <input type="text" id="articleTitle" placeholder="Article Title *" />
+      <input type="text" id="articleAuthor" placeholder="Author(s)" />
+      <input type="text" id="articleCitation" placeholder="Citation or Link" />
+      <input type="number" id="articlePages" placeholder="Number of Pages *" min="1" />
+    </div>
+
+    <div class="form-group" id="pagesGroup" style="display:none;">
+      <label>Pages read (estimate)</label>
+      <input type="number" id="pagesInput" placeholder="1" min="1" />
+    </div>
+
+    <button class="btn btn-green" onclick="addToLog()" id="addToLogBtn" style="margin-bottom:0;">
+      + Add to Log
+    </button>
+
+    <div id="readingsPreview"></div>
+
+    <div class="form-actions">
+      <button class="btn btn-green" onclick="submitLog()" id="submitBtn" disabled>✓ Submit Reading Log</button>
+      <button class="btn btn-gray" onclick="cancelLog()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="stat-card green">
+      <div class="stat-label">Days Read</div>
+      <div class="stat-value" id="statDays">0</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Books Started</div>
+      <div class="stat-value" id="statBooksStarted">0</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-label">Books Finished</div>
+      <div class="stat-value" id="statBooksFinished">0</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #8b5cf6;">
+      <div class="stat-label">Total Pages</div>
+      <div class="stat-value" id="statPages">0</div>
+    </div>
+  </div>
+
+  <!-- Western Canon Progress -->
+  <div style="background: linear-gradient(135deg, #065f46, #047857); border-radius: 16px; padding: 24px; margin-bottom: 24px; color: white; box-shadow: 0 4px 20px rgba(6,95,70,0.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <div style="font-size: 0.85rem; opacity: 0.9; margin-bottom: 4px;">WESTERN CANON PROGRESS</div>
+        <div style="font-size: 2rem; font-weight: 800; line-height: 1;" id="canonProgressPercent">0%</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 1.5rem; font-weight: 700;" id="canonProgressCount">0/25</div>
+        <div style="font-size: 0.75rem; opacity: 0.9;">books complete</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.2); height: 12px; border-radius: 6px; overflow: hidden;">
+      <div id="canonProgressBar" style="background: white; height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="calendar-card">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">&#8249;</button>
+      <h3 id="calTitle"></h3>
+      <button class="cal-nav" onclick="changeMonth(1)">&#8250;</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:#10b981;"></div> Read
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:#f3f4f6; border:1px solid #e5e7eb;"></div> Not read
+      </div>
+    </div>
+  </div>
+
+  <!-- Books list -->
+  <div id="booksSection"></div>
+
+  <!-- Articles list -->
+  <div id="articlesSection"></div>
+
+</div>
+<!-- End mainApp -->
+
+</div>
+
+<!-- Analytics Modal -->
+<div id="analyticsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto;">
+  <div style="max-width:900px; margin:40px auto; background:white; border-radius:16px; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h2 style="font-size:1.8rem; font-weight:800; color:#065f46;">📊 Reading Analytics</h2>
+      <button onclick="closeAnalytics()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">×</button>
+    </div>
+    
+    <!-- Key Stats -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:32px;">
+      <div style="background:#f0fdf4; border-radius:12px; padding:16px; border-left:4px solid #10b981;">
+        <div style="font-size:0.75rem; color:#6b7280; margin-bottom:4px;">CURRENT STREAK</div>
+        <div style="font-size:2rem; font-weight:800; color:#065f46;" id="currentStreak">0</div>
+        <div style="font-size:0.7rem; color:#9ca3af;">days</div>
+      </div>
+      <div style="background:#fef3c7; border-radius:12px; padding:16px; border-left:4px solid #f59e0b;">
+        <div style="font-size:0.75rem; color:#6b7280; margin-bottom:4px;">LONGEST STREAK</div>
+        <div style="font-size:2rem; font-weight:800; color:#92400e;" id="longestStreak">0</div>
+        <div style="font-size:0.7rem; color:#9ca3af;">days</div>
+      </div>
+      <div style="background:#ede9fe; border-radius:12px; padding:16px; border-left:4px solid #8b5cf6;">
+        <div style="font-size:0.75rem; color:#6b7280; margin-bottom:4px;">AVG PAGES/DAY</div>
+        <div style="font-size:2rem; font-weight:800; color:#6b21a8;" id="avgPages">0</div>
+        <div style="font-size:0.7rem; color:#9ca3af;">pages</div>
+      </div>
+    </div>
+    
+    <!-- Charts Container -->
+    <div id="chartsContainer"></div>
+    
+    <button onclick="closeAnalytics()" class="btn btn-gray" style="width:100%; margin-top:24px;">Close</button>
+  </div>
+</div>
+
+<!-- Milestone Celebration Modal -->
+<div id="milestoneModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; overflow-y:auto;">
+  <div style="max-width:500px; margin:80px auto; background:linear-gradient(135deg, #fbbf24, #f59e0b); border-radius:24px; padding:48px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.5); text-align:center; color:white;">
+    <div style="font-size:5rem; margin-bottom:16px;" id="milestoneIcon">🎉</div>
+    <h2 style="font-size:2.5rem; font-weight:900; margin-bottom:12px;" id="milestoneTitle">Milestone Reached!</h2>
+    <p style="font-size:1.3rem; opacity:0.95; margin-bottom:24px;" id="milestoneMessage">You've read 100 pages!</p>
+    <div style="background:rgba(255,255,255,0.2); border-radius:12px; padding:16px; margin-bottom:24px;">
+      <div style="font-size:0.85rem; opacity:0.9; margin-bottom:4px;">TOTAL PAGES READ</div>
+      <div style="font-size:3rem; font-weight:900;" id="milestoneTotal">100</div>
+    </div>
+    <p style="font-size:1rem; font-style:italic; opacity:0.9; margin-bottom:32px;" id="milestoneQuote">"The more that you read, the more things you will know."</p>
+    <button onclick="closeMilestone()" class="btn" style="background:white; color:#f59e0b; font-size:1.1rem; padding:14px 32px; font-weight:700;">Keep Reading! 📖</button>
+  </div>
+</div>
+
+<!-- Recap Menu Modal -->
+<div id="recapMenuModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; overflow-y:auto;">
+  <div style="max-width:400px; margin:80px auto; background:linear-gradient(135deg, #f5e6d3, #ecdcc5); border-radius:16px; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid #8b5a2b;">
+    <h2 style="font-size:1.8rem; font-weight:700; margin-bottom:24px; color:#2d1b0e; text-align:center;">📅 Reading Recaps</h2>
+    <button onclick="showWeeklyRecap()" class="btn btn-green" style="width:100%; margin-bottom:12px; font-size:1.1rem;">Weekly Recap</button>
+    <button onclick="showMonthlyRecap()" class="btn btn-green" style="width:100%; margin-bottom:24px; font-size:1.1rem;">Monthly Recap</button>
+    <button onclick="closeRecapMenu()" class="btn btn-gray" style="width:100%;">Close</button>
+  </div>
+</div>
+
+<!-- Weekly Recap Modal -->
+<div id="weeklyRecapModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10001; overflow-y:auto;">
+  <div style="max-width:600px; margin:40px auto; background:linear-gradient(135deg, #f5e6d3, #ecdcc5); border-radius:24px; padding:40px; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:3px solid #8b5a2b;">
+    <div style="text-align:center; margin-bottom:32px;">
+      <div style="font-size:4rem; margin-bottom:12px;">📚</div>
+      <h2 style="font-size:2rem; font-weight:800; color:#2d1b0e; margin-bottom:8px;">Weekly Reading Recap</h2>
+      <p style="font-size:1rem; color:#6b4423;" id="weeklyRecapDate"></p>
+    </div>
+    
+    <div id="weeklyRecapContent"></div>
+    
+    <button onclick="closeWeeklyRecap()" class="btn btn-green" style="width:100%; margin-top:24px; font-size:1.1rem;">Close</button>
+  </div>
+</div>
+
+<!-- Monthly Recap Modal -->
+<div id="monthlyRecapModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10001; overflow-y:auto;">
+  <div style="max-width:700px; margin:40px auto; background:linear-gradient(135deg, #f5e6d3, #ecdcc5); border-radius:24px; padding:40px; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:3px solid #8b5a2b;">
+    <div style="text-align:center; margin-bottom:32px;">
+      <div style="font-size:4rem; margin-bottom:12px;">📖</div>
+      <h2 style="font-size:2rem; font-weight:800; color:#2d1b0e; margin-bottom:8px;">Monthly Reading Recap</h2>
+      <p style="font-size:1rem; color:#6b4423;" id="monthlyRecapDate"></p>
+    </div>
+    
+    <div id="monthlyRecapContent"></div>
+    
+    <button onclick="closeMonthlyRecap()" class="btn btn-green" style="width:100%; margin-top:24px; font-size:1.1rem;">Close</button>
+  </div>
+</div>
+
+<script>
+  // ─── Data ───────────────────────────────────────────────────────────────────
+  const STORAGE_KEY = 'onePageADay_data';
+  const ONBOARDING_KEY = 'onePageADay_onboarded';
+
+  let currentOnboardingStep = 0;
+  let selectedCanonBooks = new Set();
+
+  // ─── Onboarding ─────────────────────────────────────────────────────────────
+  function checkOnboarding() {
+    if (data.onboardingComplete) {
+      document.getElementById('mainApp').style.display = 'block';
+    } else {
+      showOnboarding();
+    }
+  }
+
+  function nextOnboarding() {
+    if (currentOnboardingStep < 5) {
+      goToOnboarding(currentOnboardingStep + 1);
+    } else {
+      completeOnboarding();
+    }
+  }
+
+  function resetOnboarding() {
+    data.onboardingComplete = false;
+    saveData(data);
+    location.reload();
+  }
+
+  function exportData() {
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `one-page-a-day-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    alert('Your reading data has been exported! Keep this file safe as a backup.');
+  }
+
+  const LITERARY_QUOTES = [
+    { text: "A reader lives a thousand lives before he dies. The man who never reads lives only one.", author: "George R.R. Martin" },
+    { text: "The only thing that you absolutely have to know is the location of the library.", author: "Albert Einstein" },
+    { text: "There is no friend as loyal as a book.", author: "Ernest Hemingway" },
+    { text: "Books are a uniquely portable magic.", author: "Stephen King" },
+    { text: "A room without books is like a body without a soul.", author: "Marcus Tullius Cicero" },
+    { text: "So many books, so little time.", author: "Frank Zappa" },
+    { text: "Reading is essential for those who seek to rise above the ordinary.", author: "Jim Rohn" },
+    { text: "I have always imagined that Paradise will be a kind of library.", author: "Jorge Luis Borges" },
+    { text: "The reading of all good books is like a conversation with the finest minds of past centuries.", author: "René Descartes" },
+    { text: "Books are the plane, and the train, and the road. They are the destination, and the journey.", author: "Anna Quindlen" },
+    { text: "A book is a dream that you hold in your hand.", author: "Neil Gaiman" },
+    { text: "Reading is to the mind what exercise is to the body.", author: "Joseph Addison" },
+    { text: "You can never get a cup of tea large enough or a book long enough to suit me.", author: "C.S. Lewis" },
+    { text: "Think before you speak. Read before you think.", author: "Fran Lebowitz" },
+    { text: "Let's be reasonable and add an eighth day to the week that is devoted exclusively to reading.", author: "Lena Dunham" },
+    { text: "If you don't like to read, you haven't found the right book.", author: "J.K. Rowling" },
+    { text: "I do believe something very magical can happen when you read a good book.", author: "J.K. Rowling" },
+    { text: "Reading is a discount ticket to everywhere.", author: "Mary Schmich" },
+    { text: "Once you learn to read, you will be forever free.", author: "Frederick Douglass" },
+    { text: "Any book that helps a child to form a habit of reading, to make reading one of his needs, is good for him.", author: "Maya Angelou" },
+    { text: "It is what you read when you don't have to that determines what you will be when you can't help it.", author: "Oscar Wilde" },
+    { text: "The man who does not read has no advantage over the man who cannot read.", author: "Mark Twain" },
+    { text: "To learn to read is to light a fire; every syllable that is spelled out is a spark.", author: "Victor Hugo" },
+    { text: "Never trust anyone who has not brought a book with them.", author: "Lemony Snicket" },
+    { text: "There are worse crimes than burning books. One of them is not reading them.", author: "Joseph Brodsky" },
+    { text: "Reading gives us someplace to go when we have to stay where we are.", author: "Mason Cooley" },
+    { text: "A book is a gift you can open again and again.", author: "Garrison Keillor" },
+    { text: "Show me a family of readers, and I will show you the people who move the world.", author: "Napoléon Bonaparte" },
+    { text: "Literacy is a bridge from misery to hope.", author: "Kofi Annan" },
+    { text: "One glance at a book and you hear the voice of another person, perhaps someone dead for 1,000 years.", author: "Carl Sagan" }
+  ];
+
+  const WESTERN_CANON = [
+    { title: "The Hebrew Bible (Tanakh)", author: "" },
+    { title: "The Iliad", author: "Homer" },
+    { title: "The Odyssey", author: "Homer" },
+    { title: "The History of the Peloponnesian War", author: "Thucydides" },
+    { title: "The Republic", author: "Plato" },
+    { title: "Nicomachean Ethics", author: "Aristotle" },
+    { title: "Politics", author: "Aristotle" },
+    { title: "The Aeneid", author: "Virgil" },
+    { title: "The New Testament", author: "" },
+    { title: "Confessions", author: "Augustine of Hippo" },
+    { title: "The Divine Comedy", author: "Dante Alighieri" },
+    { title: "Summa Theologica", author: "Thomas Aquinas" },
+    { title: "Hamlet", author: "William Shakespeare" },
+    { title: "The Prince", author: "Niccolò Machiavelli" },
+    { title: "Don Quixote", author: "Miguel de Cervantes" },
+    { title: "Leviathan", author: "Thomas Hobbes" },
+    { title: "Second Treatise of Government", author: "John Locke" },
+    { title: "The Social Contract", author: "Jean-Jacques Rousseau" },
+    { title: "The Wealth of Nations", author: "Adam Smith" },
+    { title: "Critique of Pure Reason", author: "Immanuel Kant" },
+    { title: "The Federalist Papers", author: "Alexander Hamilton, James Madison, John Jay" },
+    { title: "Phenomenology of Spirit", author: "G. W. F. Hegel" },
+    { title: "Thus Spoke Zarathustra", author: "Friedrich Nietzsche" },
+    { title: "The Brothers Karamazov", author: "Fyodor Dostoevsky" },
+    { title: "Being and Nothingness", author: "Jean-Paul Sartre" }
+  ];
+
+  function getDailyQuote() {
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    const quoteIndex = dayOfYear % LITERARY_QUOTES.length;
+    return LITERARY_QUOTES[quoteIndex];
+  }
+
+  function renderDailyQuote() {
+    const quote = getDailyQuote();
+    document.getElementById('quoteText').textContent = `"${quote.text}"`;
+    document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { sessions: [], books: [], onboardingComplete: false }; // books: [{ id, title, author, totalPages }]
+  }
+
+  function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  let data = loadData();
+  let currentMonth = new Date();
+  let readingsToLog = [];
+  let selectedDate = todayStr(); // Track which date we're logging for
+
+  // ─── Helpers ────────────────────────────────────────────────────────────────
+  function todayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function hasReadToday() {
+    return data.sessions.some(s => s.date === todayStr());
+  }
+
+  function getReadingDays() {
+    return new Set(data.sessions.map(s => s.date));
+  }
+
+  function getTotalPages() {
+    return data.sessions.reduce((total, session) =>
+      total + session.books.reduce((sum, b) => sum + (b.pages || 0), 0), 0);
+  }
+
+  function getBookStats() {
+    const map = new Map();
+    
+    // First, add all books from sessions
+    data.sessions.forEach(session => {
+      session.books.forEach(book => {
+        const key = book.title.toLowerCase();
+        if (!map.has(key)) map.set(key, { title: book.title, author: book.author || '', daysRead: new Set(), totalPages: 0 });
+        map.get(key).daysRead.add(session.date);
+        map.get(key).totalPages += (book.pages || 0);
+      });
+    });
+    
+    // Then, add any books from data.books that aren't in sessions yet (like onboarding books)
+    data.books.forEach(book => {
+      const key = book.title.toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, { title: book.title, author: book.author || '', daysRead: new Set(), totalPages: 0 });
+      }
+    });
+    
+    return Array.from(map.values())
+      .map(b => {
+        const bookData = data.books.find(book => book.title.toLowerCase() === b.title.toLowerCase());
+        const bookLength = bookData?.totalPages || 0;
+        const progress = bookLength > 0 ? Math.min(100, Math.round((b.totalPages / bookLength) * 100)) : 0;
+        const isFinished = bookLength > 0 && b.totalPages >= bookLength;
+        
+        // Auto-mark as finished if not already marked
+        if (isFinished && bookData && !bookData.finished) {
+          bookData.finished = true;
+          bookData.finishDate = new Date().toISOString().split('T')[0];
+          saveData(data);
+        }
+        
+        return { 
+          ...b, 
+          daysRead: b.daysRead.size,
+          bookLength,
+          progress,
+          finished: bookData?.finished || false,
+          finishDate: bookData?.finishDate
+        };
+      })
+      .sort((a, b) => b.daysRead - a.daysRead);
+  }
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
+  function render() {
+    renderDailyPrompt();
+    renderStats();
+    renderCanonProgress();
+    renderCalendar();
+    renderBooks();
+    renderArticles();
+    renderBookSelect();
+    renderReadingsPreview();
+    updateSubmitBtn();
+  }
+
+  function renderDailyPrompt() {
+    const el = document.getElementById('dailyPrompt');
+    if (hasReadToday()) {
+      el.innerHTML = `
+        <div class="already-read">✅ Great job — you've logged reading for today!</div>
+        <div class="add-more-row">
+          <button class="btn btn-green" onclick="showLogForm()">+ Add More Reading</button>
+        </div>`;
+    } else {
+      el.innerHTML = `
+        <div class="read-today-banner">
+          <h2>Did you read today?</h2>
+          <p>Take a moment to log your reading progress</p>
+          <button class="btn btn-white" onclick="showLogForm()">Log Today's Reading</button>
+        </div>`;
+    }
+  }
+
+  function renderStats() {
+    const stats = getBookStats();
+    const finishedCount = stats.filter(b => b.finished).length;
+    
+    document.getElementById('statDays').textContent  = getReadingDays().size;
+    document.getElementById('statBooksStarted').textContent = stats.length;
+    document.getElementById('statBooksFinished').textContent = finishedCount;
+    document.getElementById('statPages').textContent = getTotalPages();
+  }
+
+  function renderCalendar() {
+    const year  = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay   = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const readingDays = getReadingDays();
+    const today = todayStr();
+
+    // Calculate pages per day (sum all sessions for each day)
+    const pagesPerDay = {};
+    data.sessions.forEach(session => {
+      const totalPages = session.books.reduce((sum, book) => sum + (book.pages || 0), 0);
+      if (!pagesPerDay[session.date]) {
+        pagesPerDay[session.date] = 0;
+      }
+      pagesPerDay[session.date] += totalPages;
+    });
+
+    // Calculate sessions per day
+    const sessionsPerDay = {};
+    data.sessions.forEach(session => {
+      if (!sessionsPerDay[session.date]) {
+        sessionsPerDay[session.date] = 0;
+      }
+      sessionsPerDay[session.date]++;
+    });
+
+    document.getElementById('calTitle').textContent =
+      currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    // Day labels
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day-label';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    // Empty cells
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      grid.appendChild(el);
+    }
+
+    // Days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const el = document.createElement('div');
+      const classes = ['cal-day'];
+      const isFuture = dateStr > today;
+      
+      if (readingDays.has(dateStr)) classes.push('did-read');
+      else classes.push('no-read');
+      if (dateStr === today) classes.push('today');
+      el.className = classes.join(' ');
+      
+      // Show day number, page count, and session count
+      const pages = pagesPerDay[dateStr] || 0;
+      const sessions = sessionsPerDay[dateStr] || 0;
+      if (pages > 0) {
+        el.innerHTML = `
+          <div style="font-size:0.7rem; line-height:1;">${d}</div>
+          <div style="font-size:0.65rem; opacity:0.9; font-weight:600;">${pages}p</div>
+          ${sessions > 1 ? `<div style="font-size:0.6rem; opacity:0.85; font-weight:600; color:#fbbf24;">${sessions}s</div>` : ''}
+        `;
+      } else {
+        el.textContent = d;
+      }
+      
+      // Only allow clicking on past/present dates
+      if (!isFuture) {
+        el.style.cursor = 'pointer';
+        el.onclick = () => showLogFormForDate(dateStr);
+      } else {
+        el.style.opacity = '0.4';
+        el.style.cursor = 'not-allowed';
+      }
+      
+      grid.appendChild(el);
+    }
+  }
+
+  function renderBooks() {
+    const stats = getBookStats();
+    const section = document.getElementById('booksSection');
+
+    if (stats.length === 0) {
+      section.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <p>No reading logged yet. Start by logging your first reading session!</p>
+          <button class="btn btn-green" onclick="showLogForm()">Log Your First Reading</button>
+        </div>`;
+      return;
+    }
+
+    const activeBooks = stats.filter(b => !b.finished);
+    const finishedBooks = stats.filter(b => b.finished);
+
+    const renderBook = (book) => {
+      const bookData = data.books.find(b => b.title.toLowerCase() === book.title.toLowerCase());
+      const bookId = bookData?.id;
+      return `
+        <div class="book-row">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <div class="book-title">${esc(book.title)}</div>
+              ${book.finished ? '<span style="background:#10b981; color:white; padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:600;">✓ FINISHED</span>' : ''}
+            </div>
+            ${book.author ? `<div class="book-author">${esc(book.author)}</div>` : ''}
+            <div class="book-pages">${book.totalPages} pages read${book.bookLength > 0 ? ` of ${book.bookLength}` : ''}</div>
+            ${book.bookLength > 0 ? `
+              <div style="background:#e5e7eb; height:6px; border-radius:3px; margin-top:6px; overflow:hidden;">
+                <div style="background:#10b981; height:100%; width:${book.progress}%; transition:width 0.3s;"></div>
+              </div>
+              <div style="font-size:0.75rem; color:#6b7280; margin-top:3px;">${book.progress}% complete</div>
+            ` : `
+              <button onclick="editBookLength('${bookId}')" style="background:#f0fdf4; color:#059669; border:1px solid #a7f3d0; padding:4px 10px; border-radius:6px; font-size:0.75rem; margin-top:6px; cursor:pointer;">+ Add book length</button>
+            `}
+            ${book.finished && book.finishDate ? `<div style="font-size:0.75rem; color:#9ca3af; margin-top:4px;">Finished ${new Date(book.finishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>` : ''}
+          </div>
+          <div class="book-days">
+            <div class="book-days-num">${book.daysRead}</div>
+            <div class="book-days-label">days read</div>
+          </div>
+        </div>`;
+    };
+
+    let html = '';
+    
+    if (activeBooks.length > 0) {
+      html += `
+        <div class="books-card" style="margin-bottom:24px;">
+          <h2>Currently Reading</h2>
+          ${activeBooks.map(renderBook).join('')}
+        </div>`;
+    }
+
+    if (finishedBooks.length > 0) {
+      html += `
+        <div class="books-card">
+          <h2>Completed Books (${finishedBooks.length})</h2>
+          ${finishedBooks.map(renderBook).join('')}
+        </div>`;
+    }
+
+    section.innerHTML = html;
+  }
+
+  function renderBookSelect() {
+    const sel = document.getElementById('bookSelect');
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">Choose a book...</option><option value="new">+ Add New Book</option><option value="article">+ Add Article</option>';
+    
+    // Only include books that have been logged in sessions
+    const booksWithSessions = new Set();
+    data.sessions.forEach(session => {
+      session.books.forEach(book => {
+        booksWithSessions.add(book.title.toLowerCase());
+      });
+    });
+    
+    // Filter and sort books
+    const booksToShow = data.books
+      .filter(book => booksWithSessions.has(book.title.toLowerCase()))
+      .sort((a, b) => {
+        // Extract last name (last word of author field)
+        const getLastName = (author) => {
+          if (!author) return '';
+          const parts = author.trim().split(/\s+/);
+          return parts[parts.length - 1].toLowerCase();
+        };
+        
+        const lastNameA = getLastName(a.author);
+        const lastNameB = getLastName(b.author);
+        
+        return lastNameA.localeCompare(lastNameB);
+      });
+    
+    booksToShow.forEach(book => {
+      const opt = document.createElement('option');
+      opt.value = book.id;
+      opt.textContent = book.title + (book.author ? ` by ${book.author}` : '');
+      sel.appendChild(opt);
+    });
+    
+    sel.value = currentVal;
+  }
+
+  function renderArticles() {
+    const section = document.getElementById('articlesSection');
+    
+    if (!data.articles || data.articles.length === 0) {
+      section.innerHTML = '';
+      return;
+    }
+
+    // Sort articles by date read (most recent first)
+    const sortedArticles = [...data.articles].sort((a, b) => 
+      b.dateRead.localeCompare(a.dateRead)
+    );
+
+    section.innerHTML = `
+      <div class="books-card" style="margin-top:24px;">
+        <h2>Completed Articles (${data.articles.length})</h2>
+        <div style="space-y-3;">
+          ${sortedArticles.map(article => `
+            <div style="padding:16px; background:#fef3c7; border-left:4px solid #f59e0b; border-radius:8px; margin-bottom:12px;">
+              <div style="font-weight:700; font-size:0.95rem; color:#374151; margin-bottom:4px;">${esc(article.title)}</div>
+              ${article.author ? `<div style="font-size:0.85rem; color:#6b7280; margin-bottom:4px;">${esc(article.author)}</div>` : ''}
+              ${article.citation ? `<div style="font-size:0.75rem; color:#9ca3af; margin-bottom:6px; font-style:italic;">${esc(article.citation)}</div>` : ''}
+              <div style="display:flex; gap:16px; font-size:0.75rem; color:#92400e;">
+                <span><strong>${article.pages}</strong> pages</span>
+                <span>Read: ${new Date(article.dateRead).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderReadingsPreview() {
+    const el = document.getElementById('readingsPreview');
+    if (readingsToLog.length === 0) { el.innerHTML = ''; return; }
+    const dateStr = document.getElementById('dateInput').value;
+    const isToday = dateStr === todayStr();
+    const dateLabel = isToday ? 'Today' : new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    el.innerHTML = `
+      <div class="readings-preview">
+        <h4>${dateLabel}'s readings:</h4>
+        ${readingsToLog.map((r, i) => `
+          <div class="reading-item">
+            <div>
+              <div class="reading-item-title">${esc(r.title)}</div>
+              ${r.author ? `<div class="reading-item-sub">${esc(r.author)}</div>` : ''}
+              <div class="reading-item-sub">${r.pages} pages</div>
+            </div>
+            <button class="btn-red" onclick="removeFromLog(${i})">Remove</button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  function updateSubmitBtn() {
+    document.getElementById('submitBtn').disabled = readingsToLog.length === 0;
+  }
+
+  // ─── Form interactions ───────────────────────────────────────────────────────
+  function showLogForm() {
+    selectedDate = todayStr();
+    const dateInput = document.getElementById('dateInput');
+    dateInput.value = selectedDate;
+    dateInput.max = todayStr(); // Prevent future dates
+    document.getElementById('logForm').style.display = 'block';
+    document.getElementById('logForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showLogFormForDate(dateStr) {
+    selectedDate = dateStr;
+    const dateInput = document.getElementById('dateInput');
+    dateInput.value = selectedDate;
+    dateInput.max = todayStr(); // Prevent future dates
+    document.getElementById('logForm').style.display = 'block';
+    document.getElementById('logForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelLog() {
+    readingsToLog = [];
+    document.getElementById('logForm').style.display = 'none';
+    document.getElementById('bookSelect').value = '';
+    document.getElementById('newBookFields').style.display = 'none';
+    document.getElementById('pagesGroup').style.display = 'none';
+    renderReadingsPreview();
+    updateSubmitBtn();
+  }
+
+  function onBookSelectChange() {
+    const val = document.getElementById('bookSelect').value;
+    document.getElementById('newBookFields').style.display = val === 'new' ? 'flex' : 'none';
+    document.getElementById('articleFields').style.display = val === 'article' ? 'flex' : 'none';
+    document.getElementById('pagesGroup').style.display = (val && val !== 'article') ? 'block' : 'none';
+  }
+
+  function addToLog() {
+    const sel = document.getElementById('bookSelect').value;
+    const pages = parseInt(document.getElementById('pagesInput').value) || 1;
+
+    if (sel === 'article') {
+      const title = document.getElementById('articleTitle').value.trim();
+      const author = document.getElementById('articleAuthor').value.trim();
+      const citation = document.getElementById('articleCitation').value.trim();
+      const articlePages = parseInt(document.getElementById('articlePages').value);
+      
+      if (!title) { alert('Please enter an article title'); return; }
+      if (!articlePages) { alert('Please enter the number of pages'); return; }
+
+      readingsToLog.push({ 
+        title, 
+        author, 
+        citation,
+        pages: articlePages, 
+        isArticle: true 
+      });
+      
+      document.getElementById('articleTitle').value = '';
+      document.getElementById('articleAuthor').value = '';
+      document.getElementById('articleCitation').value = '';
+      document.getElementById('articlePages').value = '';
+      document.getElementById('bookSelect').value = '';
+      document.getElementById('articleFields').style.display = 'none';
+    } else if (sel === 'new') {
+      const title = document.getElementById('newBookTitle').value.trim();
+      const author = document.getElementById('newBookAuthor').value.trim();
+      const totalPages = parseInt(document.getElementById('newBookLength').value) || 0;
+      if (!title) { alert('Please enter a book title'); return; }
+
+      readingsToLog.push({ title, author, pages, totalPages, isNew: true });
+      document.getElementById('newBookTitle').value = '';
+      document.getElementById('newBookAuthor').value = '';
+      document.getElementById('newBookLength').value = '';
+    } else if (sel) {
+      const book = data.books.find(b => String(b.id) === String(sel));
+      if (!book) return;
+      readingsToLog.push({ title: book.title, author: book.author || '', pages, bookId: book.id });
+    } else {
+      alert('Please choose a book first'); return;
+    }
+
+    document.getElementById('pagesInput').value = '';
+    document.getElementById('bookSelect').value = '';
+    document.getElementById('newBookFields').style.display = 'none';
+    document.getElementById('pagesGroup').style.display = 'none';
+
+    renderReadingsPreview();
+    updateSubmitBtn();
+  }
+
+  function removeFromLog(index) {
+    readingsToLog.splice(index, 1);
+    renderReadingsPreview();
+    updateSubmitBtn();
+  }
+
+  function submitLog() {
+    if (readingsToLog.length === 0) return;
+    const logDate = document.getElementById('dateInput').value || todayStr();
+    
+    // Prevent logging for future dates
+    if (logDate > todayStr()) {
+      alert("You can't log reading for future dates!");
+      return;
+    }
+
+    // Calculate pages being added
+    const pagesBeingAdded = readingsToLog.reduce((sum, r) => sum + r.pages, 0);
+    const currentTotal = getTotalPages();
+    const newTotal = currentTotal + pagesBeingAdded;
+
+    // Initialize articles array if it doesn't exist
+    if (!data.articles) data.articles = [];
+
+    // Add new books to the books list
+    readingsToLog.forEach(r => {
+      if (r.isNew) {
+        const exists = data.books.find(b =>
+          b.title.toLowerCase() === r.title.toLowerCase());
+        if (!exists) {
+          data.books.push({ 
+            id: Date.now() + Math.random(), 
+            title: r.title, 
+            author: r.author,
+            totalPages: r.totalPages || 0
+          });
+        }
+      } else if (r.isArticle) {
+        // Add article to articles list
+        data.articles.push({
+          id: Date.now() + Math.random(),
+          title: r.title,
+          author: r.author,
+          citation: r.citation,
+          pages: r.pages,
+          dateRead: logDate
+        });
+      }
+    });
+
+    // Create a new session (don't merge - this allows multiple sessions per day)
+    data.sessions.push({
+      date: logDate,
+      timestamp: Date.now(),
+      books: readingsToLog.map(r => ({ 
+        title: r.title, 
+        author: r.author, 
+        pages: r.pages,
+        isArticle: r.isArticle || false
+      }))
+    });
+
+    saveData(data);
+    readingsToLog = [];
+    document.getElementById('logForm').style.display = 'none';
+    document.getElementById('bookSelect').value = '';
+    render();
+    
+    // Check for milestones AFTER saving and rendering
+    checkMilestone(newTotal);
+  }
+
+  // ─── Calendar navigation ─────────────────────────────────────────────────────
+  function changeMonth(dir) {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + dir, 1);
+    renderCalendar();
+  }
+
+  // ─── Edit book length ────────────────────────────────────────────────────────
+  function editBookLength(bookId) {
+    const book = data.books.find(b => String(b.id) === String(bookId));
+    if (!book) return;
+    
+    const pages = prompt(`How many pages is "${book.title}"?`, book.totalPages || '');
+    if (pages === null) return; // User cancelled
+    
+    const pageCount = parseInt(pages);
+    if (isNaN(pageCount) || pageCount < 1) {
+      alert('Please enter a valid number of pages');
+      return;
+    }
+    
+    book.totalPages = pageCount;
+    saveData(data);
+    render();
+  }
+
+  // ─── Notifications ───────────────────────────────────────────────────────────
+  function updateNotifButton() {
+    const btn = document.getElementById('notifBtn');
+    const granted = 'Notification' in window && Notification.permission === 'granted';
+    btn.className = 'notif-btn ' + (granted ? 'on' : 'off');
+    btn.textContent = granted ? '🔔 Notifications On' : '🔔 Enable Notifications';
+  }
+
+  async function toggleNotifications() {
+    if (!('Notification' in window)) { alert('Notifications not supported in this browser'); return; }
+    if (Notification.permission !== 'granted') {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') scheduleNotifications();
+    }
+    updateNotifButton();
+  }
+
+  function scheduleNotifications() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const now = new Date();
+
+    [10, 22].forEach(hour => {
+      const target = new Date(now);
+      target.setHours(hour, 0, 0, 0);
+      if (target <= now) target.setDate(target.getDate() + 1);
+      const delay = target - now;
+      setTimeout(() => {
+        if (!hasReadToday()) {
+          new Notification('One Page a Day', {
+            body: 'Have you read today? Log your progress! 📖',
+            tag: 'reading-reminder'
+          });
+        }
+        // Reschedule for next day
+        setTimeout(() => scheduleNotifications(), 1000);
+      }, delay);
+    });
+  }
+
+  // ─── Utility ─────────────────────────────────────────────────────────────────
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─── Canon Management ────────────────────────────────────────────────────────
+  let currentCanonIndex = 0;
+
+  function getCanonProgress() {
+    const stats = getBookStats();
+    console.log('All book stats:', stats);
+    const finishedCanonBooks = stats.filter(book => {
+      if (!book.finished) return false;
+      const isCanon = WESTERN_CANON.some(canon => 
+        canon.title.toLowerCase() === book.title.toLowerCase());
+      console.log(`Book: ${book.title}, Finished: ${book.finished}, Is Canon: ${isCanon}`);
+      return isCanon;
+    });
+    
+    console.log('Finished canon books:', finishedCanonBooks);
+    const percentage = Math.round((finishedCanonBooks.length / WESTERN_CANON.length) * 100);
+    return { count: finishedCanonBooks.length, total: WESTERN_CANON.length, percentage };
+  }
+
+  function renderCanonProgress() {
+    const progress = getCanonProgress();
+    document.getElementById('canonProgressPercent').textContent = `${progress.percentage}%`;
+    document.getElementById('canonProgressCount').textContent = `${progress.count}/${progress.total}`;
+    document.getElementById('canonProgressBar').style.width = `${progress.percentage}%`;
+  }
+
+  function renderCanonQuestion() {
+    if (currentCanonIndex >= WESTERN_CANON.length) {
+      // Done with all books, go to final screen
+      nextOnboarding();
+      return;
+    }
+    
+    const book = WESTERN_CANON[currentCanonIndex];
+    document.getElementById('canonBookNumber').textContent = currentCanonIndex + 1;
+    document.getElementById('canonBookTitle').textContent = book.title;
+    document.getElementById('canonBookAuthor').textContent = book.author || '';
+  }
+
+  function answerCanonBook(hasRead) {
+    if (hasRead) {
+      const book = WESTERN_CANON[currentCanonIndex];
+      selectedCanonBooks.add(book.title);
+    }
+    
+    currentCanonIndex++;
+    
+    if (currentCanonIndex >= WESTERN_CANON.length) {
+      // Done with all books, go to final screen
+      nextOnboarding();
+    } else {
+      renderCanonQuestion();
+    }
+  }
+
+  function skipCanonQuestions() {
+    // Skip to final onboarding screen
+    currentCanonIndex = WESTERN_CANON.length;
+    nextOnboarding();
+  }
+
+  // ─── Onboarding ──────────────────────────────────────────────────────────────
+
+  function showOnboarding() {
+    document.getElementById('onboarding').style.display = 'block';
+    document.getElementById('mainApp').style.display = 'none';
+    goToOnboarding(0);
+  }
+
+  function goToOnboarding(step) {
+    // Hide all screens
+    for (let i = 0; i <= 5; i++) {
+      const screen = document.getElementById(`onboarding-${i}`);
+      if (screen) screen.style.display = 'none';
+    }
+    
+    // Show target screen
+    const targetScreen = document.getElementById(`onboarding-${step}`);
+    if (targetScreen) {
+      targetScreen.style.display = 'flex';
+      currentOnboardingStep = step;
+      
+      // Initialize canon questions on step 4
+      if (step === 4) {
+        currentCanonIndex = 0;
+        renderCanonQuestion();
+      }
+    }
+  }
+
+  function nextOnboarding() {
+    if (currentOnboardingStep < 5) {
+      goToOnboarding(currentOnboardingStep + 1);
+    } else {
+      completeOnboarding();
+    }
+  }
+
+  function completeOnboarding() {
+    console.log('Selected canon books:', Array.from(selectedCanonBooks));
+    
+    // Add selected canon books to data and mark as finished
+    selectedCanonBooks.forEach(title => {
+      const canonBook = WESTERN_CANON.find(b => b.title === title);
+      if (canonBook) {
+        console.log('Adding book as finished:', canonBook.title);
+        data.books.push({
+          id: Date.now() + Math.random(),
+          title: canonBook.title,
+          author: canonBook.author,
+          totalPages: 0,
+          finished: true,  // Mark as finished so it counts toward canon progress
+          finishDate: new Date().toISOString().split('T')[0]
+        });
+      }
+    });
+    
+    console.log('All books after onboarding:', data.books);
+    
+    data.onboardingComplete = true;
+    saveData(data);
+    
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    render();
+  }
+
+  // ─── Milestones ───────────────────────────────────────────────────────────────
+  function checkMilestone(newTotalPages) {
+    // Initialize lastMilestone if it doesn't exist
+    if (!data.lastMilestone) data.lastMilestone = 0;
+    
+    const milestones = [10, 50, 100];
+    let highestMilestone = null;
+    
+    // Check special milestones (10, 50, 100)
+    for (const milestone of milestones) {
+      if (data.lastMilestone < milestone && newTotalPages >= milestone) {
+        highestMilestone = milestone;
+      }
+    }
+    
+    // Check for every 100 pages (200, 300, 400...)
+    const lastHundred = Math.floor(data.lastMilestone / 100) * 100;
+    const currentHundred = Math.floor(newTotalPages / 100) * 100;
+    
+    if (currentHundred > lastHundred && currentHundred >= 200) {
+      // If we crossed multiple hundreds, use the highest
+      highestMilestone = currentHundred;
+    }
+    
+    // Show only the highest milestone reached
+    if (highestMilestone) {
+      showMilestone(highestMilestone, newTotalPages);
+      data.lastMilestone = highestMilestone;
+      saveData(data);
+    }
+  }
+
+  function showMilestone(milestone, totalPages) {
+    const is500 = milestone % 500 === 0;
+    
+    const milestoneData = {
+      10: { icon: '📚', title: 'First 10 Pages!', quote: 'Every journey begins with a single page.' },
+      50: { icon: '🌟', title: '50 Pages Down!', quote: 'You\'re building momentum!' },
+      100: { icon: '🎯', title: 'Century Club!', quote: '100 pages is just the beginning.' },
+    };
+    
+    let icon = '🎉';
+    let title = `${milestone} Pages!`;
+    let quote = 'The more that you read, the more things you will know.';
+    
+    if (is500) {
+      icon = '🏆';
+      title = `${milestone} PAGES! 🔥`;
+      quote = 'You\'re unstoppable! This is a major achievement.';
+    } else if (milestoneData[milestone]) {
+      icon = milestoneData[milestone].icon;
+      title = milestoneData[milestone].title;
+      quote = milestoneData[milestone].quote;
+    }
+    
+    document.getElementById('milestoneIcon').textContent = icon;
+    document.getElementById('milestoneTitle').textContent = title;
+    document.getElementById('milestoneMessage').textContent = `You've reached ${milestone} pages!`;
+    document.getElementById('milestoneTotal').textContent = totalPages;
+    document.getElementById('milestoneQuote').textContent = `"${quote}"`;
+    
+    document.getElementById('milestoneModal').style.display = 'block';
+  }
+
+  function closeMilestone() {
+    document.getElementById('milestoneModal').style.display = 'none';
+  }
+
+  // ─── Recaps ───────────────────────────────────────────────────────────────────
+  function showRecapMenu() {
+    document.getElementById('recapMenuModal').style.display = 'block';
+  }
+
+  function closeRecapMenu() {
+    document.getElementById('recapMenuModal').style.display = 'none';
+  }
+
+  function showWeeklyRecap() {
+    closeRecapMenu();
+    renderWeeklyRecap();
+    document.getElementById('weeklyRecapModal').style.display = 'block';
+  }
+
+  function closeWeeklyRecap() {
+    document.getElementById('weeklyRecapModal').style.display = 'none';
+  }
+
+  function showMonthlyRecap() {
+    closeRecapMenu();
+    renderMonthlyRecap();
+    document.getElementById('monthlyRecapModal').style.display = 'block';
+  }
+
+  function closeMonthlyRecap() {
+    document.getElementById('monthlyRecapModal').style.display = 'none';
+  }
+
+  function getWeekData() {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Start on Sunday
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // End on Saturday
+    
+    const startStr = startOfWeek.toISOString().split('T')[0];
+    const endStr = endOfWeek.toISOString().split('T')[0];
+    
+    const weekSessions = data.sessions.filter(s => s.date >= startStr && s.date <= endStr);
+    
+    const totalPages = weekSessions.reduce((sum, session) => {
+      return sum + session.books.reduce((bookSum, book) => bookSum + (book.pages || 0), 0);
+    }, 0);
+    
+    const daysRead = new Set(weekSessions.map(s => s.date)).size;
+    
+    const booksRead = new Map();
+    weekSessions.forEach(session => {
+      session.books.forEach(book => {
+        if (!book.isArticle) {
+          const key = book.title.toLowerCase();
+          if (!booksRead.has(key)) {
+            booksRead.set(key, { title: book.title, author: book.author, pages: 0 });
+          }
+          booksRead.get(key).pages += book.pages;
+        }
+      });
+    });
+    
+    return {
+      startDate: startOfWeek,
+      endDate: endOfWeek,
+      totalPages,
+      daysRead,
+      totalSessions: weekSessions.length,
+      books: Array.from(booksRead.values()).sort((a, b) => b.pages - a.pages)
+    };
+  }
+
+  function getMonthData() {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const startStr = startOfMonth.toISOString().split('T')[0];
+    const endStr = endOfMonth.toISOString().split('T')[0];
+    
+    const monthSessions = data.sessions.filter(s => s.date >= startStr && s.date <= endStr);
+    
+    const totalPages = monthSessions.reduce((sum, session) => {
+      return sum + session.books.reduce((bookSum, book) => bookSum + (book.pages || 0), 0);
+    }, 0);
+    
+    const daysRead = new Set(monthSessions.map(s => s.date)).size;
+    
+    const booksRead = new Map();
+    monthSessions.forEach(session => {
+      session.books.forEach(book => {
+        if (!book.isArticle) {
+          const key = book.title.toLowerCase();
+          if (!booksRead.has(key)) {
+            booksRead.set(key, { title: book.title, author: book.author, pages: 0 });
+          }
+          booksRead.get(key).pages += book.pages;
+        }
+      });
+    });
+    
+    const booksCompleted = data.books.filter(b => {
+      if (!b.finished || !b.finishDate) return false;
+      return b.finishDate >= startStr && b.finishDate <= endStr;
+    });
+    
+    return {
+      startDate: startOfMonth,
+      endDate: endOfMonth,
+      totalPages,
+      daysRead,
+      totalSessions: monthSessions.length,
+      books: Array.from(booksRead.values()).sort((a, b) => b.pages - a.pages),
+      booksCompleted
+    };
+  }
+
+  function renderWeeklyRecap() {
+    const weekData = getWeekData();
+    
+    document.getElementById('weeklyRecapDate').textContent = 
+      `${weekData.startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekData.endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    
+    const avgPages = weekData.daysRead > 0 ? Math.round(weekData.totalPages / weekData.daysRead) : 0;
+    
+    document.getElementById('weeklyRecapContent').innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:24px;">
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2rem; font-weight:800; color:#8b5a2b;">${weekData.totalPages}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Total Pages</div>
+        </div>
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2rem; font-weight:800; color:#8b5a2b;">${weekData.daysRead}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Days Read</div>
+        </div>
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2rem; font-weight:800; color:#8b5a2b;">${avgPages}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Avg Per Day</div>
+        </div>
+      </div>
+      
+      ${weekData.books.length > 0 ? `
+        <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <h3 style="font-size:1.1rem; font-weight:700; color:#2d1b0e; margin-bottom:12px;">Books You Read</h3>
+          ${weekData.books.map(book => `
+            <div style="padding:8px 0; border-bottom:1px solid #f0e9dd;">
+              <div style="font-weight:600; color:#2d1b0e;">${esc(book.title)}</div>
+              ${book.author ? `<div style="font-size:0.85rem; color:#6b4423;">${esc(book.author)}</div>` : ''}
+              <div style="font-size:0.8rem; color:#9a8066; margin-top:2px;">${book.pages} pages</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="text-align:center; color:#6b4423; font-style:italic;">No reading logged this week yet.</p>'}
+    `;
+  }
+
+  function renderMonthlyRecap() {
+    const monthData = getMonthData();
+    
+    document.getElementById('monthlyRecapDate').textContent = 
+      monthData.startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    const avgPages = monthData.daysRead > 0 ? Math.round(monthData.totalPages / monthData.daysRead) : 0;
+    const readingRate = Math.round((monthData.daysRead / new Date(monthData.endDate.getFullYear(), monthData.endDate.getMonth() + 1, 0).getDate()) * 100);
+    
+    document.getElementById('monthlyRecapContent').innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-bottom:24px;">
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2.5rem; font-weight:800; color:#8b5a2b;">${monthData.totalPages}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Total Pages</div>
+        </div>
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2.5rem; font-weight:800; color:#8b5a2b;">${monthData.daysRead}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Days Read</div>
+        </div>
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2.5rem; font-weight:800; color:#8b5a2b;">${avgPages}</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Avg Pages/Day</div>
+        </div>
+        <div style="background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size:2.5rem; font-weight:800; color:#8b5a2b;">${readingRate}%</div>
+          <div style="font-size:0.75rem; color:#6b4423; margin-top:4px;">Reading Rate</div>
+        </div>
+      </div>
+      
+      ${monthData.booksCompleted.length > 0 ? `
+        <div style="background:#fff; border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <h3 style="font-size:1.1rem; font-weight:700; color:#2d1b0e; margin-bottom:12px;">📚 Books Completed (${monthData.booksCompleted.length})</h3>
+          ${monthData.booksCompleted.map(book => `
+            <div style="padding:8px 0; border-bottom:1px solid #f0e9dd;">
+              <div style="font-weight:600; color:#2d1b0e;">${esc(book.title)}</div>
+              ${book.author ? `<div style="font-size:0.85rem; color:#6b4423;">${esc(book.author)}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      
+      ${monthData.books.length > 0 ? `
+        <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <h3 style="font-size:1.1rem; font-weight:700; color:#2d1b0e; margin-bottom:12px;">Top Books Read</h3>
+          ${monthData.books.slice(0, 5).map((book, idx) => `
+            <div style="padding:8px 0; border-bottom:1px solid #f0e9dd; display:flex; align-items:center; gap:12px;">
+              <div style="font-size:1.5rem; font-weight:800; color:#b8956a; min-width:30px;">${idx + 1}</div>
+              <div style="flex:1;">
+                <div style="font-weight:600; color:#2d1b0e;">${esc(book.title)}</div>
+                ${book.author ? `<div style="font-size:0.85rem; color:#6b4423;">${esc(book.author)}</div>` : ''}
+                <div style="font-size:0.8rem; color:#9a8066; margin-top:2px;">${book.pages} pages</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="text-align:center; color:#6b4423; font-style:italic;">No reading logged this month yet.</p>'}
+    `;
+  }
+
+  // ─── Analytics ────────────────────────────────────────────────────────────────
+  function showAnalytics() {
+    renderAnalytics();
+    document.getElementById('analyticsModal').style.display = 'block';
+  }
+
+  function closeAnalytics() {
+    document.getElementById('analyticsModal').style.display = 'none';
+  }
+
+  function getStreakData() {
+    if (data.sessions.length === 0) return { current: 0, longest: 0 };
+    
+    const dates = data.sessions.map(s => s.date).sort();
+    const today = todayStr();
+    
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+    
+    // Calculate streaks
+    for (let i = dates.length - 1; i >= 0; i--) {
+      const date = new Date(dates[i]);
+      const nextDate = i < dates.length - 1 ? new Date(dates[i + 1]) : new Date(today);
+      const dayDiff = Math.floor((nextDate - date) / (1000 * 60 * 60 * 24));
+      
+      if (dayDiff <= 1) {
+        tempStreak++;
+        longestStreak = Math.max(longestStreak, tempStreak);
+      } else {
+        tempStreak = 1;
+      }
+    }
+    
+    // Calculate current streak
+    const lastDate = new Date(dates[dates.length - 1]);
+    const todayDate = new Date(today);
+    const daysSinceLastRead = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+    
+    if (daysSinceLastRead <= 1) {
+      for (let i = dates.length - 1; i >= 0; i--) {
+        const date = new Date(dates[i]);
+        const nextDate = i < dates.length - 1 ? new Date(dates[i + 1]) : todayDate;
+        const dayDiff = Math.floor((nextDate - date) / (1000 * 60 * 60 * 24));
+        
+        if (dayDiff <= 1) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+    }
+    
+    return { current: currentStreak, longest: longestStreak };
+  }
+
+  function getAveragePagesPerDay() {
+    if (data.sessions.length === 0) return 0;
+    const totalPages = data.sessions.reduce((sum, s) => 
+      sum + s.books.reduce((bookSum, b) => bookSum + (b.pages || 0), 0), 0);
+    return Math.round(totalPages / data.sessions.length);
+  }
+
+  function getPagesPerWeekday() {
+    const weekdayData = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+    
+    data.sessions.forEach(session => {
+      // Parse date correctly to avoid timezone issues
+      const dateParts = session.date.split('-');
+      const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+      const dayOfWeek = date.getDay();
+      const pages = session.books.reduce((sum, b) => sum + (b.pages || 0), 0);
+      weekdayData[dayOfWeek].push(pages);
+    });
+    
+    const averages = {};
+    for (let day = 0; day < 7; day++) {
+      const pages = weekdayData[day];
+      averages[day] = pages.length > 0 
+        ? Math.round(pages.reduce((a, b) => a + b, 0) / pages.length)
+        : 0;
+    }
+    
+    return averages;
+  }
+
+  function getPagesOverTime() {
+    const pagesByDate = {};
+    data.sessions.forEach(session => {
+      const pages = session.books.reduce((sum, b) => sum + (b.pages || 0), 0);
+      pagesByDate[session.date] = pages;
+    });
+    return pagesByDate;
+  }
+
+  function getBooksCompletedOverTime() {
+    const completions = data.books
+      .filter(b => b.finished && b.finishDate)
+      .map(b => ({ date: b.finishDate, title: b.title }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    
+    return completions;
+  }
+
+  function renderAnalytics() {
+    // Update key stats
+    const streaks = getStreakData();
+    document.getElementById('currentStreak').textContent = streaks.current;
+    document.getElementById('longestStreak').textContent = streaks.longest;
+    document.getElementById('avgPages').textContent = getAveragePagesPerDay();
+    
+    // Render charts
+    const container = document.getElementById('chartsContainer');
+    container.innerHTML = '';
+    
+    // Pages over time chart
+    container.innerHTML += renderPagesChart();
+    
+    // Weekday breakdown chart
+    container.innerHTML += renderWeekdayChart();
+    
+    // Books completed timeline
+    container.innerHTML += renderBooksCompletedChart();
+  }
+
+  function renderPagesChart() {
+    const pagesData = getPagesOverTime();
+    const dates = Object.keys(pagesData).sort();
+    const maxPages = Math.max(...Object.values(pagesData), 10);
+    
+    if (dates.length === 0) {
+      return '<div style="background:#f9fafb; border-radius:12px; padding:24px; margin-bottom:24px; text-align:center; color:#9ca3af;">No reading data yet</div>';
+    }
+    
+    const recentDates = dates.slice(-30);
+    
+    return `
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:24px;">
+        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:16px; color:#374151;">Pages Read Over Time (Last 30 Days)</h3>
+        <div style="display:flex; align-items:flex-end; justify-content:space-around; height:200px; gap:4px; border-bottom:2px solid #e5e7eb; padding:0 8px;">
+          ${recentDates.map(date => {
+            const pages = pagesData[date];
+            const height = Math.max((pages / maxPages) * 150, 5);
+            const dateObj = new Date(date);
+            const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return `
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-width:20px;">
+                <div style="font-size:0.7rem; color:#065f46; margin-bottom:4px; font-weight:700;">${pages}</div>
+                <div style="width:80%; background:linear-gradient(to top, #10b981, #34d399); border-radius:4px 4px 0 0; height:${height}px; min-height:5px; box-shadow:0 2px 4px rgba(16,185,129,0.2);" title="${label}: ${pages} pages"></div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:8px; padding:0 8px;">
+          <div style="font-size:0.7rem; color:#9ca3af;">${new Date(recentDates[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+          <div style="font-size:0.7rem; color:#9ca3af;">${new Date(recentDates[recentDates.length-1]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderWeekdayChart() {
+    const weekdayData = getPagesPerWeekday();
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const maxPages = Math.max(...Object.values(weekdayData), 10);
+    
+    return `
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:24px;">
+        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:16px; color:#374151;">Average Pages by Weekday</h3>
+        <div style="display:flex; align-items:flex-end; justify-content:space-around; height:200px; gap:8px; border-bottom:2px solid #e5e7eb; padding:0 8px;">
+          ${days.map((day, idx) => {
+            const pages = weekdayData[idx];
+            const height = Math.max((pages / maxPages) * 150, 5);
+            return `
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; max-width:80px;">
+                <div style="font-size:0.85rem; color:#6b21a8; margin-bottom:4px; font-weight:700;">${pages}</div>
+                <div style="width:80%; background:linear-gradient(to top, #8b5cf6, #a78bfa); border-radius:4px 4px 0 0; height:${height}px; min-height:5px; box-shadow:0 2px 4px rgba(139,92,246,0.2);"></div>
+                <div style="font-size:0.8rem; color:#374151; margin-top:12px; font-weight:600;">${day}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderBooksCompletedChart() {
+    const completions = getBooksCompletedOverTime();
+    
+    if (completions.length === 0) {
+      return '<div style="background:#f9fafb; border-radius:12px; padding:24px; text-align:center; color:#9ca3af;">No books completed yet</div>';
+    }
+    
+    return `
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:12px; padding:20px;">
+        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:16px; color:#374151;">Books Completed Timeline</h3>
+        <div style="max-height:200px; overflow-y:auto;">
+          ${completions.map((book, idx) => {
+            const date = new Date(book.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            return `
+              <div style="display:flex; align-items:center; gap:12px; padding:8px; border-left:3px solid #10b981; margin-bottom:8px; background:#f0fdf4; border-radius:4px;">
+                <div style="font-size:1.2rem; font-weight:800; color:#065f46; min-width:30px;">${idx + 1}</div>
+                <div style="flex:1;">
+                  <div style="font-weight:600; color:#374151;">${esc(book.title)}</div>
+                  <div style="font-size:0.75rem; color:#6b7280;">${date}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── Install Prompt ───────────────────────────────────────────────────────────
+  function checkInstallPrompt() {
+    // Check if user has dismissed the prompt before
+    if (localStorage.getItem('installPromptDismissed')) return;
+    
+    // Check if already installed (standalone mode)
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    if (window.navigator.standalone === true) return; // iOS
+    
+    // Show prompt after 3 seconds
+    setTimeout(() => {
+      document.getElementById('installPrompt').style.display = 'block';
+    }, 3000);
+  }
+
+  function dismissInstallPrompt() {
+    document.getElementById('installPrompt').style.display = 'none';
+    localStorage.setItem('installPromptDismissed', 'true');
+  }
+
+  // ─── Init ────────────────────────────────────────────────────────────────────
+  checkOnboarding();
+  updateNotifButton();
+  scheduleNotifications();
+  renderDailyQuote();
+  checkInstallPrompt();
+  render();
+</script>
+</body>
+</html>
